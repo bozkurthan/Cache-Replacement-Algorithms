@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+
 from algorithm import cache_decision_sample, cache_decision_part1, cache_decision_part2
 
 np.random.seed(1)
@@ -94,7 +95,7 @@ def main():
             elif (algo == 1):
                 cache_decision_part1(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
             else:
-                cache_decision_part2(my_cache, file, file_size)
+                cache_decision_part2(my_cache, fileID, file_sizes[fileID])
             if (verbose_time):
                 time.sleep(1)
 
