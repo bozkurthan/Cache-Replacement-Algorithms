@@ -2,17 +2,18 @@ import time
 
 import numpy as np
 
-from algorithm import cache_decision_sample, cache_decision_part1, cache_decision_part2
+from algorithm import cache_decision_sample, cache_decision_part1, cache_decision_part2, test1, test2
 
 np.random.seed(1)
 
 verbose = False  # Set it to True to print which files are in the cache.
 verbose_time = False
-algo = 1
+algo = 3
 custom_list = [0] * 100
 total_hit_cost = [0] * 100
 time2 = 0
 replacement_cost = 0
+hit_count = 0
 
 
 class Cache:
@@ -36,6 +37,8 @@ class Cache:
                 print("Cache:", self.stored_files)
         else:
             print("cannot remove from cache: not in cache")
+            print("file:", fileID)
+            time.sleep(1)
 
     def store_in_cache(self, fileID):
         if self.cache_size + self.file_size[fileID] < self.cache_capacity:
@@ -53,9 +56,10 @@ class Cache:
             print("cannot add to cache: exceeding capacity. ")
 
 
+
 def main():
     global time2
-
+    global hit_count
     a = 1
     r = 1.1
     no_of_files = 100
@@ -74,14 +78,14 @@ def main():
         file_sizes = [a * r ** (n - 1) for n in range(1, no_of_files + 1)]
         np.random.shuffle(file_sizes)
         file_sizes = file_sizes / np.sum(file_sizes)  # Normalize the sum to 1.
-
+        #        for i in range(100):
+        #            print("file",i+1, " size:%.20f"%file_sizes[i])
         # Build an empty cache
         cache_capacity = 0.1
         my_cache = Cache(cache_capacity, file_sizes)
 
         # Generate demands based on the file popularity
         demands = np.random.choice(100, 100000, p=file_popularity)
-
         for i in range(len(demands)):
             time2 += 1
             fileID = demands[i]
@@ -89,11 +93,18 @@ def main():
                 hit_penalty += file_sizes[fileID]
                 custom_list[fileID] = custom_list[fileID] + 1
                 total_hit_cost[fileID] += file_sizes[fileID]
+            else:
+                hit_count = hit_count + 1
 
             if (algo == 0):
                 cache_decision_sample(my_cache, fileID, file_sizes[fileID])
             elif (algo == 1):
                 cache_decision_part1(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
+            elif (algo == 2):
+                test1(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
+            elif (algo == 3):
+                test2(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
+
             else:
                 cache_decision_part2(my_cache, fileID, file_sizes[fileID])
             if (verbose_time):
@@ -104,9 +115,14 @@ def main():
     print("Hit Penalty: ", hit_penalty / no_of_runs)
     print("Replacement Penalty: ", replacement_penalty / no_of_runs)
     print("Total Penalty: ", (hit_penalty + replacement_penalty) / no_of_runs)
-    if (verbose):
-        for x in range(100):
-            print("File ", x, "*** Hit count:", custom_list[x], "*** Hit cost:", total_hit_cost[x], "\n")
+    print("Hit rate:", hit_count / 1000000)
+
+    # print("Hit count: \n")
+    # for x in range(100):
+    #     print(custom_list[x])
+    # print("Hit cost: \n")
+    # for x in range(100):
+    #     print(total_hit_cost[x])
 
 
 if __name__ == "__main__":

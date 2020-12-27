@@ -5,6 +5,12 @@ global list_of_filesID
 list_of_popularity = []
 list_of_filesID = []
 list_of_size = []
+list_of_k_value = []
+k_parameter = 0.002
+total_hit_cost = [0] * 100
+
+number_of_miss_better_files = 0
+
 
 verbose = False  # Set it to True to print which files are in the cache.
 verbose_time = False
@@ -58,6 +64,152 @@ def cache_decision_part1(my_cache, file, file_popularity, file_size):
             list_of_popularity.append(file_popularity)
             list_of_filesID.append(file)
             list_of_size.append(file_size)
+
+
+def test1(my_cache, file, file_popularity, file_size):
+    global list_of_popularity
+
+    if file not in my_cache.stored_files:
+        if (len(my_cache.stored_files) != len(list_of_popularity)):
+            list_of_popularity.clear()
+            list_of_filesID.clear()
+            list_of_size.clear()
+
+        if (my_cache.cache_size + file_size < my_cache.cache_capacity):
+            my_cache.store_in_cache(file)
+            list_of_popularity.append(file_popularity)
+            list_of_filesID.append(file)
+            list_of_size.append(file_size)
+        else:
+            total_hit_cost[file] += file_size
+            # If the cache capacity is full,
+            # remove the least popular from the cache until there is enough space for the new file.
+            current_total_pop = 0
+
+            for x in range(len(list_of_popularity)):
+                current_total_pop += list_of_popularity[x]
+            #  print("current_pop:",current_total_pop)
+            length = len(list_of_popularity)
+            if (len(list_of_popularity) == 0):
+                length = 1
+
+            if (file_size / file_popularity > 0.05):
+
+                while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                    index_min = min(range(len(list_of_popularity)), key=list_of_popularity.__getitem__)
+                    delete_item = list_of_filesID[index_min]
+
+                    if (file_size > list_of_size[0]):
+                        if (file_popularity > list_of_popularity[0]):
+                            index_min = 0
+                            delete_item = list_of_filesID[0]
+
+                    if (verbose):
+                        print("Custom_Index:", index_min)
+                        print("Delete item:", delete_item)
+
+                    my_cache.remove_from_cache(delete_item)
+                    list_of_popularity.pop(index_min)
+                    list_of_filesID.pop(index_min)
+                    list_of_size.pop(index_min)
+                    if (verbose):
+                        print("Custom List:", list_of_filesID)
+                    if (verbose_time):
+                        time.sleep(1)
+                my_cache.store_in_cache(file)
+                list_of_popularity.append(file_popularity)
+                list_of_filesID.append(file)
+                list_of_size.append(file_size)
+
+
+def test2(my_cache, file, file_popularity, file_size):
+    global list_of_popularity
+    global number_of_miss_better_files
+    if file not in my_cache.stored_files:
+        if (len(my_cache.stored_files) != len(list_of_popularity)):
+            list_of_popularity.clear()
+            list_of_filesID.clear()
+            list_of_size.clear()
+            list_of_k_value.clear()
+
+        total_hit_cost[file] += file_size
+
+        if my_cache.cache_size + file_size < my_cache.cache_capacity:
+            my_cache.store_in_cache(file)
+            list_of_popularity.append(file_popularity)
+            list_of_filesID.append(file)
+            list_of_size.append(file_size)
+            list_of_k_value.append(file_size / file_popularity)
+        else:
+            if (my_cache.cache_size > 0.06):
+                pass
+                # current_total_pop = 0
+                # for x in range(len(list_of_popularity)):
+                #     current_total_pop += list_of_popularity[x]
+                # print("current_pop:",current_total_pop)
+                # length = len(list_of_popularity)
+                # if (len(list_of_popularity) == 0):
+                #     length = 1
+                # if(file_popularity>(current_total_pop/length+0.2)):
+                #     print("you shouldn't miss this file","current:",current_total_pop/length,"this file:",file_popularity)
+                #    # index_max_size = max(range(len(list_of_size)), key=list_of_size.__getitem__)
+                #     while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                #         index_min = min(range(len(list_of_k_value)), key=list_of_k_value.__getitem__)
+                #         delete_item = list_of_filesID[index_min]
+                #         my_cache.remove_from_cache(delete_item)
+                #         list_of_popularity.pop(index_min)
+                #         list_of_filesID.pop(index_min)
+                #         list_of_size.pop(index_min)
+                #         list_of_k_value.pop(index_min)
+                #         print("New Cache_size:%.20f" % my_cache.cache_size)
+                #
+                #     my_cache.store_in_cache(file)
+                #     list_of_popularity.append(file_popularity)
+                #     list_of_filesID.append(file)
+                #     list_of_size.append(file_size)
+                #     list_of_k_value.append(file_size/file_popularity)
+
+                current_total_pop = 0
+                for x in range(len(list_of_popularity)):
+                    current_total_pop += list_of_popularity[x]
+                print("current_pop:", current_total_pop)
+                length = len(list_of_popularity)
+                if (len(list_of_popularity) == 0):
+                    length = 1
+                if (file_popularity > (current_total_pop / length)):
+                    print("you shouldn't miss this file", "current:", current_total_pop / length, "this file:",
+                          file_popularity)
+                    number_of_miss_better_files = number_of_miss_better_files + 1
+                    print("better file missed", number_of_miss_better_files)
+
+            else:
+
+                current_total_pop = 0
+                for x in range(len(list_of_popularity)):
+                    current_total_pop += list_of_popularity[x]
+                print("current_pop:", current_total_pop)
+                length = len(list_of_popularity)
+                if (len(list_of_popularity) == 0):
+                    length = 1
+                if (file_popularity > (current_total_pop / length)):
+                    print("you shouldn't miss this file", "current:", current_total_pop / length, "this file:",
+                          file_popularity)
+                    # index_max_size = max(range(len(list_of_size)), key=list_of_size.__getitem__)
+                    while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                        index_min = min(range(len(list_of_k_value)), key=list_of_k_value.__getitem__)
+                        delete_item = list_of_filesID[index_min]
+                        my_cache.remove_from_cache(delete_item)
+                        list_of_popularity.pop(index_min)
+                        list_of_filesID.pop(index_min)
+                        list_of_size.pop(index_min)
+                        list_of_k_value.pop(index_min)
+                        print("New Cache_size:%.20f" % my_cache.cache_size)
+
+                    my_cache.store_in_cache(file)
+                    list_of_popularity.append(file_popularity)
+                    list_of_filesID.append(file)
+                    list_of_size.append(file_size)
+                    list_of_k_value.append(file_size / file_popularity)
 
 
 # You will fill inside this function for part 2. You can only use the information given in the arguments.
