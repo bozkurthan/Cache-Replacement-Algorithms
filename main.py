@@ -2,19 +2,19 @@ import time
 
 import numpy as np
 
-from algorithm import cache_decision_sample, cache_decision_part1, cache_decision_part2, test1, test2
+from algorithm import cache_decision_sample, cache_decision_part1, cache_decision_part2
 
-np.random.seed(1)
+np.random.seed(100)
 
 verbose = False  # Set it to True to print which files are in the cache.
 verbose_time = False
-algo = 3
+algo = 1
 custom_list = [0] * 100
 total_hit_cost = [0] * 100
 time2 = 0
 replacement_cost = 0
 hit_count = 0
-
+cache_size_ut = 0
 
 class Cache:
 
@@ -60,11 +60,12 @@ class Cache:
 def main():
     global time2
     global hit_count
+    global cache_size_ut
     a = 1
     r = 1.1
     no_of_files = 100
 
-    no_of_runs = 10
+    no_of_runs = 100
     hit_penalty = 0
     replacement_penalty = 0
 
@@ -89,6 +90,7 @@ def main():
         for i in range(len(demands)):
             time2 += 1
             fileID = demands[i]
+            cache_size_ut = my_cache.cache_size + cache_size_ut
             if fileID not in my_cache.stored_files:
                 hit_penalty += file_sizes[fileID]
                 custom_list[fileID] = custom_list[fileID] + 1
@@ -99,11 +101,7 @@ def main():
             if (algo == 0):
                 cache_decision_sample(my_cache, fileID, file_sizes[fileID])
             elif (algo == 1):
-                cache_decision_part1(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
-            elif (algo == 2):
-                test1(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
-            elif (algo == 3):
-                test2(my_cache, fileID, file_popularity[fileID], file_sizes[fileID])
+                cache_decision_part1(my_cache, fileID, file_popularity, file_sizes)
 
             else:
                 cache_decision_part2(my_cache, fileID, file_sizes[fileID])
@@ -115,7 +113,8 @@ def main():
     print("Hit Penalty: ", hit_penalty / no_of_runs)
     print("Replacement Penalty: ", replacement_penalty / no_of_runs)
     print("Total Penalty: ", (hit_penalty + replacement_penalty) / no_of_runs)
-    print("Hit rate:", hit_count / 1000000)
+    print("Hit rate:", hit_count / 10000000)
+    print("Cache utilization", cache_size_ut / 10000000)
 
     # print("Hit count: \n")
     # for x in range(100):
