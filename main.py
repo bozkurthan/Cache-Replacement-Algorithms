@@ -112,8 +112,8 @@ def main():
     print("Hit Penalty: ", hit_penalty / no_of_runs)
     print("Replacement Penalty: ", replacement_penalty / no_of_runs)
     print("Total Penalty: ", (hit_penalty + replacement_penalty) / no_of_runs)
-    print("Hit rate:", hit_count / 10000000)
-    print("Cache utilization", cache_size_ut / 10000000)
+    print("Hit rate:", hit_count / 1000000)
+    print("Cache utilization", cache_size_ut / 100000)
 
     print("Hit count: \n")
     # for x in range(100):
