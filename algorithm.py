@@ -9,7 +9,7 @@ k_parameter = 0.002
 total_hit_cost = [0] * 100
 counter = 0
 number_of_miss_better_files = 0
-population_bad_check = 0
+population_bad_check=0
 
 verbose = False  # Set it to True to print which files are in the cache.
 verbose_time = False
@@ -66,80 +66,80 @@ def cache_decision_part2(my_cache, file, file_sizes):
     total_hit = total_hit / 100
 
     if file not in my_cache.stored_files:
-        if (max(list_of_popularity) > 100):
-            # clear cache if pop <100
-            if (min(list_current_files_popularity) < 100):
-                index_min = min(range(len(list_current_files_popularity)),
-                                key=list_current_files_popularity.__getitem__)
-                my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                list_current_files_popularity.pop(index_min)
-            if (list_of_popularity[file] < 100):
-                pass
+            if(max(list_of_popularity)>100):
+                #clear cache if pop <100
+                if(min(list_current_files_popularity)<100):
+                    index_min = min(range(len(list_current_files_popularity)),
+                                    key=list_current_files_popularity.__getitem__)
+                    my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                    list_current_files_popularity.pop(index_min)
+                if(list_of_popularity[file]<100):
+                    pass
+                else:
+                    if my_cache.cache_size + file_size < my_cache.cache_capacity:
+                        my_cache.store_in_cache(file)
+                    else:
+                        if (list_of_cost[file] > max(list_current_files_cost)):
+                            while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                                index_min = min(range(len(list_current_files_cost)),
+                                                key=list_current_files_cost.__getitem__)
+                                my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                                list_current_files_popularity.pop(index_min)
+                                list_current_files_cost.pop(index_min)
+                            my_cache.store_in_cache(file)
+                    # restore cache
+                    if (my_cache.cache_size < 0.05):
+                        print("uyari")
+                    if (len(list_current_files_popularity) != 0):
+                        if (min(list_current_files_popularity) < 100):
+                            population_bad_check = population_bad_check + 1
+                            print(population_bad_check + 1)
             else:
                 if my_cache.cache_size + file_size < my_cache.cache_capacity:
-                    my_cache.store_in_cache(file)
-                else:
-                    if (list_of_cost[file] > max(list_current_files_cost)):
-                        while my_cache.cache_size + file_size > my_cache.cache_capacity:
-                            index_min = min(range(len(list_current_files_cost)),
-                                            key=list_current_files_cost.__getitem__)
-                            my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                            list_current_files_popularity.pop(index_min)
-                            list_current_files_cost.pop(index_min)
                         my_cache.store_in_cache(file)
-                # restore cache
-                if (my_cache.cache_size < 0.05):
+                else:
+                        if (list_of_cost[file] > max(list_current_files_cost)):
+                            while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                                index_min = min(range(len(list_current_files_cost)),
+                                                key=list_current_files_cost.__getitem__)
+                                my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                                list_current_files_popularity.pop(index_min)
+                                list_current_files_cost.pop(index_min)
+                            my_cache.store_in_cache(file)
+                #restore cache
+                if(my_cache.cache_size<0.05):
                     print("uyari")
-                if (len(list_current_files_popularity) != 0):
-                    if (min(list_current_files_popularity) < 100):
-                        population_bad_check = population_bad_check + 1
-                        print(population_bad_check + 1)
-        else:
-            if my_cache.cache_size + file_size < my_cache.cache_capacity:
-                my_cache.store_in_cache(file)
-                else:
-                    if (list_of_cost[file] > max(list_current_files_cost)):
-                        while my_cache.cache_size + file_size > my_cache.cache_capacity:
-                            index_min = min(range(len(list_current_files_cost)),
-                                            key=list_current_files_cost.__getitem__)
-                            my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                            list_current_files_popularity.pop(index_min)
-                            list_current_files_cost.pop(index_min)
-                        my_cache.store_in_cache(file)
-            # restore cache
-            if (my_cache.cache_size < 0.05):
-                print("uyari")
-            if (len(list_current_files_popularity) != 0):
-                if (min(list_current_files_popularity) < 100):
-                    population_bad_check = population_bad_check + 1
-                    print(population_bad_check + 1)
+                if(len(list_current_files_popularity)!=0):
+                    if(min(list_current_files_popularity)<100):
+                        population_bad_check=population_bad_check+1
+                        print(population_bad_check+1)
 
-                    # list_of_cost[file] = file_sizes[file] + list_of_cost[file]
-                    # index_max = max(range(len(list_of_cost)), key=list_of_cost.__getitem__)
-                    # while my_cache.cache_size + file_sizes[index_max] > my_cache.cache_capacity:
-                    #     index_min = min(range(len(list_current_files_popularity)),
-                    #                     key=list_current_files_popularity.__getitem__)
-                    #     my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                    #     list_current_files_popularity.pop(index_min)
-                    # my_cache.store_in_cache(index_max)
-                # if (list_of_popularity[file] > max(list_current_files_popularity)):
-                #     while my_cache.cache_size + file_size > my_cache.cache_capacity:
-                #         index_min = min(range(len(list_current_files_popularity)),
-                #                         key=list_current_files_popularity.__getitem__)
-                #         my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                #         list_current_files_popularity.pop(index_min)
-                #     my_cache.store_in_cache(file)
-                #
-                # else:
-                #
-                #     list_of_cost[file] = file_sizes[file] + list_of_cost[file]
-                #     index_max = max(range(len(list_of_cost)), key=list_of_cost.__getitem__)
-                #     while my_cache.cache_size + file_sizes[index_max] > my_cache.cache_capacity:
-                #         index_min = min(range(len(list_current_files_popularity)),
-                #                         key=list_current_files_popularity.__getitem__)
-                #         my_cache.remove_from_cache(my_cache.stored_files[index_min])
-                #         list_current_files_popularity.pop(index_min)
-                #     my_cache.store_in_cache(index_max)
+                        # list_of_cost[file] = file_sizes[file] + list_of_cost[file]
+                        # index_max = max(range(len(list_of_cost)), key=list_of_cost.__getitem__)
+                        # while my_cache.cache_size + file_sizes[index_max] > my_cache.cache_capacity:
+                        #     index_min = min(range(len(list_current_files_popularity)),
+                        #                     key=list_current_files_popularity.__getitem__)
+                        #     my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                        #     list_current_files_popularity.pop(index_min)
+                        # my_cache.store_in_cache(index_max)
+                    # if (list_of_popularity[file] > max(list_current_files_popularity)):
+                    #     while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                    #         index_min = min(range(len(list_current_files_popularity)),
+                    #                         key=list_current_files_popularity.__getitem__)
+                    #         my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                    #         list_current_files_popularity.pop(index_min)
+                    #     my_cache.store_in_cache(file)
+                    #
+                    # else:
+                    #
+                    #     list_of_cost[file] = file_sizes[file] + list_of_cost[file]
+                    #     index_max = max(range(len(list_of_cost)), key=list_of_cost.__getitem__)
+                    #     while my_cache.cache_size + file_sizes[index_max] > my_cache.cache_capacity:
+                    #         index_min = min(range(len(list_current_files_popularity)),
+                    #                         key=list_current_files_popularity.__getitem__)
+                    #         my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                    #         list_current_files_popularity.pop(index_min)
+                    #     my_cache.store_in_cache(index_max)
 
 def initCache(my_cache, val, wt):
     new_val = []
