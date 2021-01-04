@@ -1,12 +1,13 @@
 global list_of_popularity
 global list_of_filesID
-list_of_popularity = []
+list_of_popularity = [0] * 100
+list_of_cost = [0] * 100
 list_of_filesID = []
 list_of_size = []
 list_of_k_value = []
 k_parameter = 0.002
 total_hit_cost = [0] * 100
-
+counter = 0
 number_of_miss_better_files = 0
 
 
@@ -28,87 +29,119 @@ def cache_decision_sample(my_cache, file, file_size):
 
 # You will fill inside this function for part 1. You can only use the information given in the arguments.
 def cache_decision_part1(my_cache, file, file_popularities, file_sizes):
-    global list_of_popularity
-    global number_of_miss_better_files
-    global list_of_size
-    global list_of_k_value
-    global list_of_filesID
+    global counter
 
+    if (counter == 0):
+        initCache(my_cache, file_popularities, file_sizes)
+    if (counter == 100000):
+        counter = 0
+    counter = counter + 1
+
+
+# You will fill inside this function for part 2. You can only use the information given in the arguments.
+def cache_decision_part2(my_cache, file, file_sizes):
+    global list_of_popularity
+    global list_of_cost
+    list_current_files_popularity = []
+    list_of_popularity[file] = list_of_popularity[file] + 1
     file_size = file_sizes[file]
-    file_popularity = file_popularities[file]
+    if (len(my_cache.stored_files) == 0):
+        for i in range(100):
+            list_of_popularity[i] = 0
+            list_of_cost[i] = 0
+
+    total_hit = 0
+    for i in range(100):
+        total_hit = list_of_popularity[i] + total_hit
+
+    list_current_files = my_cache.stored_files
+    if (len(list_current_files) != 0):
+        for i in range(len(list_current_files)):
+            list_current_files_popularity.append(list_of_popularity[list_current_files[i]])
+    total_hit = total_hit / 100
 
     if file not in my_cache.stored_files:
-        if (len(my_cache.stored_files) != len(list_of_popularity)):
-            list_of_popularity.clear()
-            list_of_filesID.clear()
-            list_of_size.clear()
-            list_of_k_value.clear()
-
-        total_hit_cost[file] += file_size
-
-        if (file_popularity * file_size > 0.00005):
-
             if my_cache.cache_size + file_size < my_cache.cache_capacity:
                 my_cache.store_in_cache(file)
-                list_of_popularity.append(file_popularity)
-                list_of_filesID.append(file)
-                list_of_size.append(file_size)
-                list_of_k_value.append(file_size / file_popularity)
             else:
-                if (my_cache.cache_size > 0.05):
 
-                    current_total_pop = 0
-                    for x in range(len(list_of_popularity)):
-                        current_total_pop += list_of_popularity[x]
-                    length = len(list_of_popularity)
-                    if (len(list_of_popularity) == 0):
-                        length = 1
-                    if (file_popularity > (current_total_pop / length) + 0.038):
-                        number_of_miss_better_files = number_of_miss_better_files + 1
-                        print("better file missed", number_of_miss_better_files)
-                        while my_cache.cache_size + file_size > my_cache.cache_capacity:
-                            index_min = min(range(len(list_of_popularity)), key=list_of_popularity.__getitem__)
-                            delete_item = list_of_filesID[index_min]
-                            my_cache.remove_from_cache(delete_item)
-                            list_of_popularity.pop(index_min)
-                            list_of_filesID.pop(index_min)
-                            list_of_size.pop(index_min)
-                            list_of_k_value.pop(index_min)
-                            print("New Cache_size1:%.20f" % my_cache.cache_size)
-                        my_cache.store_in_cache(file)
-                        list_of_popularity.append(file_popularity)
-                        list_of_filesID.append(file)
-                        list_of_size.append(file_size)
-                        list_of_k_value.append(file_size / file_popularity)
+                if (list_of_popularity[file] > max(list_current_files_popularity)):
+                    while my_cache.cache_size + file_size > my_cache.cache_capacity:
+                        index_min = min(range(len(list_current_files_popularity)),
+                                        key=list_current_files_popularity.__getitem__)
+                        my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                        list_current_files_popularity.pop(index_min)
+                    my_cache.store_in_cache(file)
 
                 else:
 
-                    current_total_pop = 0
-                    for x in range(len(list_of_popularity)):
-                        current_total_pop += list_of_popularity[x]
-                    print("current_pop:", current_total_pop)
-                    length = len(list_of_popularity)
-                    if (len(list_of_popularity) == 0):
-                        length = 1
-                    if (file_popularity > (current_total_pop / length) + 0.015):
-                        print("you shouldn't miss this file", "current:", current_total_pop / length, "this file:",
-                              file_popularity)
-                        while my_cache.cache_size + file_size > my_cache.cache_capacity:
-                            index_min = min(range(len(list_of_popularity)), key=list_of_popularity.__getitem__)
-                            delete_item = list_of_filesID[index_min]
-                            my_cache.remove_from_cache(delete_item)
-                            list_of_popularity.pop(index_min)
-                            list_of_filesID.pop(index_min)
-                            list_of_size.pop(index_min)
-                            list_of_k_value.pop(index_min)
-                            print("New Cache_size2:%.20f" % my_cache.cache_size)
+                    list_of_cost[file] = file_sizes[file] + list_of_cost[file]
+                    index_max = max(range(len(list_of_cost)), key=list_of_cost.__getitem__)
+                    while my_cache.cache_size + file_sizes[index_max] > my_cache.cache_capacity:
+                        index_min = min(range(len(list_current_files_popularity)),
+                                        key=list_current_files_popularity.__getitem__)
+                        my_cache.remove_from_cache(my_cache.stored_files[index_min])
+                        list_current_files_popularity.pop(index_min)
+                    my_cache.store_in_cache(index_max)
 
-                        my_cache.store_in_cache(file)
-                        list_of_popularity.append(file_popularity)
-                        list_of_filesID.append(file)
-                        list_of_size.append(file_size)
-                        list_of_k_value.append(file_size / file_popularity)
 
-# You will fill inside this function for part 2. You can only use the information given in the arguments.
-def cache_decision_part2(my_cache, file, file_size):
-    pass
+def initCache(my_cache, val, wt):
+    new_val = []
+    new_wt = []
+    for i in range(len(val)):
+        new_val.append(int(val[i] / min(val)))
+    W = int(0.1 / min(wt))
+    for i in range(len(wt)):
+        new_wt.append(int(wt[i] / min(wt)))
+
+    n = len(new_val)
+    list_of_store = printknapSack(W, new_wt, new_val, n)
+    print(list_of_store)
+    n = len(list_of_store)
+    for i in range(n - 1, 0, -1):
+        my_cache.store_in_cache(list_of_store[i])
+
+
+def printknapSack(W, wt, val, n):
+    list_of_item = []
+    K = [[0 for w in range(W + 1)]
+         for i in range(n + 1)]
+
+    # Build table K[][] in bottom
+    # up manner
+    for i in range(n + 1):
+        for w in range(W + 1):
+            if i == 0 or w == 0:
+                K[i][w] = 0
+            elif wt[i - 1] <= w:
+                K[i][w] = max(val[i - 1]
+                              + K[i - 1][w - wt[i - 1]],
+                              K[i - 1][w])
+            else:
+                K[i][w] = K[i - 1][w]
+
+                # stores the result of Knapsack
+    res = K[n][W]
+    # print(res)
+
+    w = W
+    for i in range(n, 0, -1):
+        if res <= 0:
+            break
+        # either the result comes from the
+        # top (K[i-1][w]) or from (val[i-1]
+        # + K[i-1] [w-wt[i-1]]) as in Knapsack
+        # table. If it comes from the latter
+        # one/ it means the item is included.
+        if res == K[i - 1][w]:
+            continue
+        else:
+
+            # This item is included.
+            list_of_item.append(i - 1)
+
+            # Since this weight is included
+            # its value is deducted
+            res = res - val[i - 1]
+            w = w - wt[i - 1]
+    return (list_of_item)

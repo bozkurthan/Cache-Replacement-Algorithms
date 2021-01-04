@@ -8,7 +8,7 @@ np.random.seed(100)
 
 verbose = False  # Set it to True to print which files are in the cache.
 verbose_time = False
-algo = 1
+algo = 2
 custom_list = [0] * 100
 total_hit_cost = [0] * 100
 time2 = 0
@@ -65,7 +65,7 @@ def main():
     r = 1.1
     no_of_files = 100
 
-    no_of_runs = 100
+    no_of_runs = 1
     hit_penalty = 0
     replacement_penalty = 0
 
@@ -79,8 +79,7 @@ def main():
         file_sizes = [a * r ** (n - 1) for n in range(1, no_of_files + 1)]
         np.random.shuffle(file_sizes)
         file_sizes = file_sizes / np.sum(file_sizes)  # Normalize the sum to 1.
-        #        for i in range(100):
-        #            print("file",i+1, " size:%.20f"%file_sizes[i])
+
         # Build an empty cache
         cache_capacity = 0.1
         my_cache = Cache(cache_capacity, file_sizes)
@@ -104,7 +103,7 @@ def main():
                 cache_decision_part1(my_cache, fileID, file_popularity, file_sizes)
 
             else:
-                cache_decision_part2(my_cache, fileID, file_sizes[fileID])
+                cache_decision_part2(my_cache, fileID, file_sizes)
             if (verbose_time):
                 time.sleep(1)
 
@@ -116,12 +115,12 @@ def main():
     print("Hit rate:", hit_count / 10000000)
     print("Cache utilization", cache_size_ut / 10000000)
 
-    # print("Hit count: \n")
+    print("Hit count: \n")
     # for x in range(100):
     #     print(custom_list[x])
     # print("Hit cost: \n")
     # for x in range(100):
-    #     print(total_hit_cost[x])
+    #     print("%.5f" %total_hit_cost[x])
 
 
 if __name__ == "__main__":
