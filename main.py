@@ -65,7 +65,7 @@ def main():
     r = 1.1
     no_of_files = 100
 
-    no_of_runs = 1
+    no_of_runs = 100
     hit_penalty = 0
     replacement_penalty = 0
 
