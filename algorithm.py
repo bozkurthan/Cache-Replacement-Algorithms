@@ -34,12 +34,7 @@ def cache_decision_sample(my_cache, file, file_size):
 
 # You will fill inside this function for part 1. You can only use the information given in the arguments.
 def cache_decision_part1(my_cache, file, file_popularities, file_sizes):
-    global counter
-    if (counter == 0):
-        initCache(my_cache, file_popularities, file_sizes)
-    if (counter == 100000):
-        counter = 0
-    counter = counter + 1
+    pass
 
 def guess_k_value():
     global previous_total_cost
@@ -57,7 +52,7 @@ def guess_k_value():
     return g_k_value
 
 # You will fill inside this function for part 2. You can only use the information given in the arguments.
-def cache_decision_part2(my_cache, file, file_sizes):
+def cache_decision_part2(my_cache, file, file_size):
     global list_of_popularity
     global total_cost
     global demand_counter
@@ -70,9 +65,6 @@ def cache_decision_part2(my_cache, file, file_sizes):
     if (len(my_cache.stored_files) == 0):
         for i in range(100):
             list_of_popularity[i] = 0
-
-    file_size = file_sizes[file]
-
     #try to guess k_value
     if(demand_counter%200==0 and demand_counter!=0):
         k_value=guess_k_value()
@@ -96,7 +88,7 @@ def cache_decision_part2(my_cache, file, file_sizes):
                 res = sorted(range(len(list_of_popularity)), key=lambda sub: list_of_popularity[sub])[-20:]
                 for i in range(len(list_current_files),0):
                     if(idx[i] not in list_current_files_popularity):
-                        if(file_sizes[res[i]]+ file_size < my_cache.cache_capacity):
+                        if(my_cache.cache_size+ file_size < my_cache.cache_capacity):
                             my_cache.store_in_cache(res[i])
 
 
